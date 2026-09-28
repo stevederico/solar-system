@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#02030a" />
+    <meta name="description" content="Fly through a living 3D solar system, then sling a probe between the planets with gravity assists." />
+    <title>Orrery Sling</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2302030a'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23ffc04d'/%3E%3Cellipse cx='16' cy='16' rx='12' ry='6' fill='none' stroke='%237fe3ff' stroke-width='1.5' transform='rotate(-25 16 16)'/%3E%3Ccircle cx='26' cy='10.500' r='2' fill='%237fe3ff'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <canvas id="scene" aria-label="3D view of the solar system"></canvas>
+    <div id="labels" aria-hidden="false"></div>
+    <button id="aim-handle" type="button" aria-label="Drag to aim the launch" hidden></button>
+
+    <main id="app">
+      <section id="title-screen" class="screen" aria-labelledby="title-heading">
+        <div class="title-card">
+          <p class="eyebrow">A Pocket Solar System</p>
+          <h1 id="title-heading">Orrery Sling</h1>
+          <p class="tagline">Fly through every planet and major moon on their real orbits. Then sling a probe across the system using nothing but gravity and nerve.</p>
+          <div class="title-actions">
+            <button id="start-missions" class="button button-primary" type="button">Fly A Mission</button>
+            <button id="start-explore" class="button" type="button">Explore The System</button>
+          </div>
+          <p class="fine-print">Drag to look around. Scroll or pinch to zoom. Tap any world for facts.</p>
+        </div>
+      </section>
+
+      <header id="top-bar" hidden>
+        <button id="home-button" class="brand" type="button" aria-label="Back to title screen">Orrery Sling</button>
+        <nav class="tabs" aria-label="Mode">
+          <button id="tab-explore" class="tab" type="button">Explore</button>
+          <button id="tab-missions" class="tab" type="button">Missions</button>
+        </nav>
+        <div class="toggles">
+          <button id="toggle-scale" class="chip" type="button" aria-pressed="false">Compact Scale</button>
+          <button id="toggle-orbits" class="chip" type="button" aria-pressed="true">Orbits</button>
+          <button id="toggle-labels" class="chip" type="button" aria-pressed="true">Labels</button>
+          <button id="toggle-sound" class="chip" type="button" aria-pressed="true">Sound</button>
+        </div>
+      </header>
+
+      <aside id="info-panel" aria-live="polite" hidden>
+        <button id="info-close" class="icon-button" type="button" aria-label="Close facts">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+        </button>
+        <p id="info-kind" class="eyebrow"></p>
+        <h2 id="info-name"></h2>
+        <p id="info-blurb"></p>
+        <dl id="info-rows"></dl>
+        <p id="info-fact" class="fun-fact"></p>
+        <div id="info-moons" class="chip-row"></div>
+        <button id="info-fly" class="button button-primary" type="button">Fly To</button>
+      </aside>
+
+      <footer id="explore-bar" hidden>
+        <nav id="body-nav" class="chip-row" aria-label="Jump to a world"></nav>
+        <div class="time-row">
+          <output id="date-label" for="date-slider">1 Jan 2000</output>
+          <input id="date-slider" type="range" aria-label="Date" min="0" max="1" step="1" value="0" />
+          <button id="now-button" class="chip" type="button">Today</button>
+        </div>
+        <div class="speed-row">
+          <button id="reverse-button" class="chip" type="button" aria-pressed="false">Reverse</button>
+          <button id="play-button" class="chip chip-strong" type="button" aria-pressed="true">Pause</button>
+          <div id="speed-chips" class="chip-row" role="group" aria-label="Time speed"></div>
+        </div>
+      </footer>
+
+      <section id="mission-hud" hidden aria-live="polite">
+        <div class="mission-title">
+          <p id="mission-number" class="eyebrow"></p>
+          <h2 id="mission-name"></h2>
+          <p id="mission-brief"></p>
+        </div>
+        <div class="gauges">
+          <div class="gauge">
+            <span class="gauge-label">Fuel</span>
+            <div class="bar" role="progressbar" aria-label="Fuel" aria-valuemin="0" aria-valuemax="100" id="fuel-bar"><span id="fuel-fill"></span></div>
+            <span id="fuel-text" class="gauge-value"></span>
+          </div>
+          <div class="gauge">
+            <span class="gauge-label">Clock</span>
+            <div class="bar" role="progressbar" aria-label="Mission clock" aria-valuemin="0" aria-valuemax="100" id="clock-bar"><span id="clock-fill"></span></div>
+            <span id="clock-text" class="gauge-value"></span>
+          </div>
+          <p id="mission-status" class="status"></p>
+          <p class="gauge-note">Speeds and distances use scaled game units.</p>
+        </div>
+      </section>
+
+      <footer id="aim-panel" hidden>
+        <p id="aim-hint" class="hint"></p>
+        <label class="slider">
+          <span>Launch Day <output id="window-value"></output></span>
+          <input id="window-slider" type="range" aria-label="Launch day" min="0" max="1" step="0.01" value="0" />
+        </label>
+        <label class="slider">
+          <span>Direction <output id="angle-value"></output></span>
+          <input id="angle-slider" type="range" aria-label="Launch direction" min="-180" max="180" step="0.5" value="0" />
+        </label>
+        <label class="slider">
+          <span>Power <output id="power-value"></output></span>
+          <input id="power-slider" type="range" aria-label="Launch power" min="5" max="100" step="0.5" value="60" />
+        </label>
+        <div class="aim-actions">
+          <p id="forecast-text" class="status"></p>
+          <button id="launch-button" class="button button-primary" type="button">Launch</button>
+        </div>
+      </footer>
+
+      <footer id="flight-panel" hidden>
+        <div class="steer-pad" role="group" aria-label="Thrusters">
+          <button id="steer-left" class="steer" type="button" aria-label="Thrust left">Left</button>
+          <div class="steer-column">
+            <button id="steer-boost" class="steer" type="button" aria-label="Speed up">Boost</button>
+            <button id="steer-brake" class="steer" type="button" aria-label="Slow down">Brake</button>
+          </div>
+          <button id="steer-right" class="steer" type="button" aria-label="Thrust right">Right</button>
+        </div>
+        <div class="flight-actions">
+          <button id="warp-button" class="chip chip-strong" type="button">Speed 1x</button>
+          <button id="chase-button" class="chip" type="button" aria-pressed="false">Chase Cam</button>
+          <button id="retry-button" class="chip" type="button">Restart</button>
+        </div>
+      </footer>
+
+      <section id="level-select" class="screen" hidden aria-labelledby="levels-heading">
+        <div class="sheet">
+          <p class="eyebrow">Mission Control</p>
+          <h2 id="levels-heading">Pick A Mission</h2>
+          <p class="tagline">Aim, pick a launch day, and let gravity do the rest. Flybys add speed and points.</p>
+          <div id="level-grid" class="level-grid"></div>
+          <button id="levels-back" class="button" type="button">Back</button>
+        </div>
+      </section>
+
+      <section id="result-screen" class="screen" hidden aria-labelledby="result-heading">
+        <div class="sheet sheet-narrow">
+          <p id="result-eyebrow" class="eyebrow"></p>
+          <h2 id="result-heading"></h2>
+          <p id="result-detail" class="tagline"></p>
+          <p id="result-stars" class="stars" aria-label=""></p>
+          <dl id="result-rows"></dl>
+          <div class="title-actions">
+            <button id="result-next" class="button button-primary" type="button">Next Mission</button>
+            <button id="result-retry" class="button" type="button">Try Again</button>
+            <button id="result-menu" class="button" type="button">All Missions</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="toast" role="status" aria-live="polite"></div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

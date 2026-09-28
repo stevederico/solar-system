@@ -1,0 +1,12 @@
+node_modules
+dist
+.agent-browser
+*.log
+.DS_Store
+
+# Local notes, not part of the game
+BRIEF.md
+SUMMARY.md
+
+# Bun is the package manager
+package-lock.json
