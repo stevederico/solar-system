@@ -251,6 +251,7 @@ input:focus-visible {
   color: var(--text);
   font: 800 17px/1 var(--sans);
   letter-spacing: -0.01em;
+  white-space: nowrap;
   cursor: pointer;
   min-height: 44px;
   padding: 0 4px;
@@ -766,6 +767,13 @@ input[type='range'] {
 #toast.is-visible {
   opacity: 1;
   transform: translate(-50%, 0);
+}
+
+/* The full name needs room. Drop it before the top bar runs out of space. */
+@media (max-width: 800px) {
+  .brand {
+    display: none;
+  }
 }
 
 @media (max-width: 720px) {
