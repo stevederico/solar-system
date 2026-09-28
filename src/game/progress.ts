@@ -10,7 +10,7 @@ export interface KeyValueStore {
   setItem(key: string, value: string): void;
 }
 
-export const PROGRESS_KEY = 'orrery-sling-progress';
+export const PROGRESS_KEY = 'solar-system-simulator-progress';
 
 function isBestResult(value: unknown): value is BestResult {
   if (typeof value !== 'object' || value === null) return false;

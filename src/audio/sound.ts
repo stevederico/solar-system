@@ -1,7 +1,7 @@
 type AudioContextClass = typeof AudioContext;
 
 const MASTER_VOLUME = 0.5;
-const MUTE_KEY = 'orrery-sling-muted';
+const MUTE_KEY = 'solar-system-simulator-muted';
 
 function loadMuted(): boolean {
   try {
