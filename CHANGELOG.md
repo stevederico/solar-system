@@ -1,6 +1,15 @@
 - Add real moon phases
 - Add more missions
 
+0.6.0
+
+  Rename to Solar System Simulator
+  Add share cards
+  Add site URL setting
+  Fit name in top bar
+  Rename save keys
+  Add clone steps
+
 0.5.0
 
   Fix phone explore bar
