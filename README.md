@@ -1,6 +1,6 @@
-![Orrery Sling: Saturn and its moons](docs/screenshots/saturn.png)
+![Solar System Simulator: Saturn and its moons](docs/screenshots/saturn.png)
 
-# Orrery Sling
+# Solar System Simulator
 
 A pocket solar system you can fly through, plus a slingshot game where gravity is your engine.
 
@@ -10,12 +10,18 @@ Runs in any modern browser. No login, no backend, no downloads. Every texture an
 
 ## Play
 
+Play it at https://solar-system-simulator.grok.me or run it locally:
+
 ```bash
+git clone https://github.com/stevederico/solar-system-simulator.git
+cd solar-system-simulator
 bun install
 bun run dev
 ```
 
 Open the URL that Vite prints. The project uses Bun, and `bun.lock` is the only lockfile.
+
+Share cards link to `https://solar-system-simulator.grok.me` by default. Set `VITE_SITE_URL` to change it.
 
 ## Modes
 
